@@ -33,7 +33,7 @@ SAD fine-tunes only this decoder in about one GPU-hour, with two losses:
 
 ### ImageNet 256×256
 
-FID-50K with the ADM evaluator. For each released generator: the reported result (gray), our evaluation with the original decoder D<sub>0</sub>, and SAD on the same latents.
+FID-50K with the ADM evaluator. For each released generator, the first row uses its original decoder D<sub>0</sub> and the second row SAD on the same latents.
 
 <div align="center"><img src="assets/table_sota.png" width="90%"></div>
 
