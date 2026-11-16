@@ -114,16 +114,16 @@ images = pipe(class_labels=[279, 388], num_inference_steps=250, guidance_scale=1
 All decoders are on [Hugging Face](https://huggingface.co/torpedo2003/SAD). Each one is trained on latents of its own
 generator and sampler; use the one that matches your pipeline.
 
-| Name (`load_sad_decoder`) | Generator | Tokenizer | Sampler | FID-50K (D₀ → SAD) |
-|---|---|---|---|---|
-| `dit-xl2-256/sad-gan` | DiT-XL/2 | SD-VAE | official 250-step DDPM, cfg 1.5 | 2.30 → **2.13** |
-| `dit-xl2-256/sad-mmd` | DiT-XL/2 | SD-VAE | official 250-step DDPM, cfg 1.5 | 2.30 → 2.17 |
-| `dit-xl2-256-dpm50/sad-gan` | DiT-XL/2 | SD-VAE | 50-step DPM-Solver++, cfg 1.5 | used in our ablations |
-| `dit-xl2-256-dpm50/sad-mmd` | DiT-XL/2 | SD-VAE | 50-step DPM-Solver++, cfg 1.5 | used in our ablations |
-| `sit-xl2-repa-256/sad-gan` | SiT-XL/2 + REPA | SD-VAE | SDE 250 steps | 1.43 → **1.38** |
-| `lightningdit-xl-vavae-256/sad-gan` | LightningDiT-XL | VA-VAE | official recipe | 1.38 → **1.23** |
-| `repa-e-e2evae-256/sad-gan` | REPA-E (SiT-XL/1) | E2E-VAE | SDE 250 steps | 1.15 → **0.98** |
-| `pixart-alpha-256/sad-gan` | PixArt-α 256px | SD-VAE | as in the paper | COCO FID 34.7 → **23.6** |
+| Name (`load_sad_decoder`) | Generator | Tokenizer | Sampler |
+|---|---|---|---|
+| `dit-xl2-256/sad-gan` | DiT-XL/2 | SD-VAE | official 250-step DDPM, cfg 1.5 |
+| `dit-xl2-256/sad-mmd` | DiT-XL/2 | SD-VAE | official 250-step DDPM, cfg 1.5 |
+| `dit-xl2-256-dpm50/sad-gan` | DiT-XL/2 | SD-VAE | 50-step DPM-Solver++, cfg 1.5 |
+| `dit-xl2-256-dpm50/sad-mmd` | DiT-XL/2 | SD-VAE | 50-step DPM-Solver++, cfg 1.5 |
+| `sit-xl2-repa-256/sad-gan` | SiT-XL/2 + REPA | SD-VAE | SDE 250 steps |
+| `lightningdit-xl-vavae-256/sad-gan` | LightningDiT-XL | VA-VAE | official recipe |
+| `repa-e-e2evae-256/sad-gan` | REPA-E (SiT-XL/1) | E2E-VAE | SDE 250 steps |
+| `pixart-alpha-256/sad-gan` | PixArt-α 256px | SD-VAE | as in the paper |
 
 The VA-VAE and E2E-VAE decoders load into the autoencoder classes of the
 [LightningDiT](https://github.com/hustvl/LightningDiT) and [REPA-E](https://github.com/End2End-Diffusion/REPA-E) code bases
