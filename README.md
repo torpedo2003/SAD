@@ -29,60 +29,31 @@ SAD fine-tunes only this decoder in about one GPU-hour, with two losses:
 
 ### ImageNet 256×256 (FID-50K, ADM evaluator)
 
-The same generated latents are decoded by the original decoder D<sub>0</sub> (reproduced) and by SAD.
+For each released generator: the reported result (gray), our evaluation with the original decoder D<sub>0</sub>, and SAD on the same latents.
 
-| Generator | Tokenizer | FID ↓ | sFID ↓ | IS ↑ | Prec. ↑ | Rec. ↑ | FD<sub>CLIP</sub> ↓ |
-|---|---|---|---|---|---|---|---|
-| DiT-XL/2 | SD-VAE | 2.30 → **2.13** | 4.51 → **4.25** | 277.8 → **280.5** | 0.83 → 0.83 | 0.57 → 0.58 | 42.8 → **36.8** |
-| DiT-XL/2 + DG | SD-VAE | 1.83 → **1.69** | 5.13 → **4.24** | 285.3 → **286.2** | 0.78 → 0.79 | 0.63 → 0.63 | 46.4 → **41.0** |
-| SiT-XL/2 + REPA | SD-VAE | 1.43 → **1.38** | 4.67 → **4.00** | 306.7 → 305.4 | 0.79 → 0.79 | 0.64 → 0.64 | 39.9 → **39.4** |
-| LightningDiT-XL | VA-VAE | 1.38 → **1.23** | 4.18 → **3.82** | 291.4 → **294.4** | 0.79 → **0.80** | 0.65 → 0.65 | 29.4 → **28.2** |
-| REPA-E | E2E-VAE | 1.15 → **0.98** | 4.10 → **3.74** | 301.5 → **304.4** | 0.79 → 0.79 | 0.67 → 0.67 | 29.1 → **26.4** |
+<div align="center"><img src="assets/table_sota.png" width="90%"></div>
 
 ### Decoder-side vs. generator-side correction
 
-DiT-XL/2, official recipe, guidance 1.5. SAD needs no extra sampling and 5k real images, and it stacks with discriminator guidance (DG).
+DiT-XL/2, official recipe, guidance 1.5. SAD needs no extra sampling and only 5k real images, and it stacks with discriminator guidance (DG).
 
-| Method | Extra sampling | Real images | FID ↓ | sFID ↓ | IS ↑ |
-|---|---|---|---|---|---|
-| D<sub>0</sub> | – | – | 2.30 | 4.51 | 277.8 |
-| DG | +20% | 1.28M | 2.01 | 4.49 | 266.5 |
-| **SAD** | **0** | **5k** | 2.13 | 4.25 | **280.5** |
-| **DG + SAD** | +20% | 1.28M | **1.86** | **4.02** | 269.3 |
+<div align="center"><img src="assets/table_dg.png" width="60%"></div>
 
 ### Comparison with other decoder adaptations
 
-DiT-XL/2, 50-step DPM-Solver++, 10k samples; FD<sub>CLIP</sub> and rFID are not used in training.
+DiT-XL/2, 50-step DPM-Solver++, 10k samples. FD<sub>CLIP</sub> and rFID are not used in training. \*FDDA optimizes Inception features, the network used by FID.
 
-| Method | FID ↓ | FD<sub>CLIP</sub> ↓ | rFID ↓ | PSNR ↑ |
-|---|---|---|---|---|
-| Original decoder D<sub>0</sub> | 13.32 | 51.4 | 2.63 | 23.91 |
-| sd-vae-ft-mse | 13.40 | 51.8 | 2.91 | 24.75 |
-| Consistency Decoder | 13.18 | 57.3 | 3.34 | 23.31 |
-| Fine-tuning on encoder latents (ℓ1 + LPIPS + GAN) | 13.40 | 48.6 | 7.02 | 24.51 |
-| Noise-robust decoder | 13.40 | 51.6 | 2.67 | 24.02 |
-| Paired post-training | 13.10 | 50.8 | 2.59 | 23.91 |
-| Pixel refiner after D<sub>0</sub> | 12.54 | 45.3 | 2.63 | 23.86 |
-| FDDA (Inception in the objective) | **12.21** | 52.1 | 5.91 | 21.16 |
-| **SAD-GAN** | 12.36 | 42.4 | **2.56** | 23.92 |
-| **SAD-MMD** | 12.68 | **41.6** | 2.57 | 23.92 |
+<div align="center"><img src="assets/table_adapt.png" width="65%"></div>
 
 ### Ablation
 
-| Variant | FID ↓ | FD<sub>CLIP</sub> ↓ | rFID ↓ |
-|---|---|---|---|
-| D<sub>0</sub> | 13.32 | 51.4 | 2.63 |
-| w/o GSA (anchor only) | 13.31 | 49.9 | 2.65 |
-| GSA on encoder latents E(x) instead of generated latents | 13.59 | 51.5 | 7.70 |
-| w/o EAP | 13.06 | 50.3 | 5.06 |
-| **SAD (GSA + EAP)** | **12.36** | **42.4** | **2.56** |
+<div align="center"><img src="assets/table_ablation.png" width="65%"></div>
 
 ### Text-to-image (PixArt-α, COCO, 10k samples)
 
-| Decoder | FID ↓ | FD<sub>CLIP</sub> ↓ | CLIP score ↑ | Recall ↑ | rFID ↓ |
-|---|---|---|---|---|---|
-| D<sub>0</sub> | 34.73 | 209.1 | 26.03 | 0.286 | 4.28 |
-| **SAD** (GAN, λ = 0.01) | **23.55** | **141.6** | **26.91** | **0.416** | 4.29 |
+Pick: share of samples preferred by PickScore over D<sub>0</sub>.
+
+<div align="center"><img src="assets/table_t2i.png" width="58%"></div>
 
 ### Qualitative results
 
@@ -144,15 +115,18 @@ to its generator and sampler family.
 
 ## Training and evaluation
 
-[`training/`](training/README.md) contains the full code used in the paper: latent caching for every generator, SAD training
-(`train_sad.py`), the baselines (noise-robust decoders, paired post-training, pixel refiner, FDDA re-implementation), and
-evaluation (FID-50K with the ADM evaluator, FD<sub>CLIP</sub>, KID, SigLIP FD, CMMD, HPS, PickScore).
+[`training/`](training/README.md) contains the full code of the paper and a step-by-step guide. In short:
 
 ```bash
 cd training
-python train_sad.py --mode gen --loss gan --lam 0.05 --steps 2000 --gen_pool cfg1.5 --out runs/sad_gan
-python fid50k.py --ckpt runs/sad_gan/decoder.pt --set dit50k_cfg1.5 --ref_split_b --out results/sad_gan.json
+python prepare_data.py                                                   # ADM reference split + real images
+python gen_latents.py --n 5000 --cfg 1.5 --seed 1000 --out data/gen_train/cfg1.5_r0.npz   # cache generated latents (r = 0..7)
+python train_sad.py --mode gen --loss gan --lam 0.05 --gen_pool cfg1.5 --out runs/sad_gan   # ~1 GPU-hour
+python eval_decoder.py --sets all_cfg1.5 --ckpt runs/sad_gan/decoder.pt --out results/sad_gan.json
 ```
+
+The guide also covers FID-50K with the official ADM evaluator, the held-out metrics, every generator in the paper
+(DiT, SiT + REPA, LightningDiT, REPA-E, PixArt-α, discriminator guidance), and the baselines and ablations.
 
 ## Citation
 
