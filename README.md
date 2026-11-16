@@ -2,6 +2,10 @@
 
 # Sample-Aligned Decoders for Latent Generative Models
 
+Yu Lei<sup>1,2</sup>, Yi Li<sup>2</sup>, Hongcheng Gao<sup>3</sup>, Yipeng Wei<sup>2</sup>, Liang Li<sup>1</sup>, Li Su<sup>2</sup>, Qingming Huang<sup>2</sup>
+
+<sup>1</sup>Institute of Computing Technology, Chinese Academy of Sciences &nbsp; <sup>2</sup>University of Chinese Academy of Sciences &nbsp; <sup>3</sup>Tsinghua University
+
 <a href="https://torpedo2003.github.io/SAD/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project page"></a>
 <a href="#"><img src="https://img.shields.io/badge/arXiv-coming%20soon-b31b1b" alt="arXiv"></a>
 <a href="https://huggingface.co/torpedo2003/SAD"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Decoders-yellow" alt="Hugging Face"></a>
