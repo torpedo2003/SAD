@@ -1,5 +1,5 @@
-# Copy to env.sh and edit. All scripts assume the code/ directory as the working directory.
-export PYTHONPATH=$PWD:$PWD/analysis
+# Copy to env.sh and edit. All scripts assume training/ as the working directory.
+export PYTHONPATH=$PWD
 export HF_HOME=/path/to/hf_cache          # Hugging Face cache (DiT VAE, DINOv2, CLIP, SigLIP, PickScore)
 export PY=python
 # Expected relative layout (create symlinks as needed):

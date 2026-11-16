@@ -176,10 +176,13 @@ def main():
         loader = real_loader(max(args.bs, args.bs_anchor), seed=args.seed)
 
     # clean real target: ADM reference split A
-    split = np.load("data/adm_split.npz")["A"]
-    if args.n_real:
-        split = np.random.default_rng(0).permutation(split)[: args.n_real]
-    real_imgs = np.load(args.target_npz)["images"] if args.target_npz else np.load("data/VIRTUAL_imagenet256_labeled.npz")["arr_0"][split]
+    if args.target_npz:
+        real_imgs = np.load(args.target_npz)["images"]
+    else:
+        split = np.load("data/adm_split.npz")["A"]
+        if args.n_real:
+            split = np.random.default_rng(0).permutation(split)[: args.n_real]
+        real_imgs = np.load("data/VIRTUAL_imagenet256_labeled.npz")["arr_0"][split]
     if args.target_npz and args.n_real:
         real_imgs = real_imgs[: args.n_real]
     with torch.no_grad():

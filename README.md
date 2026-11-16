@@ -111,14 +111,14 @@ same. SAD changes how a latent is rendered: texture, color cast, exposure and lo
 **Does it cost anything at inference?** No. The fine-tuned decoder has the same architecture as the original one.
 
 **Can I train SAD for my own generator?** Yes. You need a cache of generated latents (16k–40k), a few thousand unpaired real
-images and about one GPU-hour. See [`training/`](training/README.md) and `training/scripts/run_examples.sh`.
+images and about one GPU-hour. See [Your own generator](training/README.md#your-own-generator).
 
 **What doesn't it do?** It cannot add diversity or repair a wrong structure that the generator produced, and a decoder is specific
 to its generator and sampler family.
 
 ## Training and evaluation
 
-[`training/`](training/README.md) contains the full code of the paper and a step-by-step guide. In short:
+[`training/`](training/README.md) has the training code and a short guide. In short:
 
 ```bash
 cd training
@@ -128,8 +128,7 @@ python train_sad.py --mode gen --loss gan --lam 0.05 --gen_pool cfg1.5 --out run
 python eval_decoder.py --sets all_cfg1.5 --ckpt runs/sad_gan/decoder.pt --out results/sad_gan.json
 ```
 
-The guide also covers FID-50K with the official ADM evaluator, the held-out metrics, every generator in the paper
-(DiT, SiT + REPA, LightningDiT, REPA-E, PixArt-α, discriminator guidance), and the baselines and ablations.
+The guide also explains how to train SAD for your own generator, autoencoder and real-image domain.
 
 ## Citation
 
