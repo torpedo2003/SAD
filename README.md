@@ -7,9 +7,11 @@
 <a href="https://huggingface.co/torpedo2003/SAD"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Decoders-yellow" alt="Hugging Face"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green" alt="License"></a>
 
-Fine-tune only the decoder of a frozen latent generator on its own samples: better images, same sampling pipeline, no extra inference cost.
+The decoder of a latent generative model is trained on encoder latents, but at test time it decodes the generator's latents.<br>
+SAD fine-tunes only the decoder on these generated latents, in about one GPU-hour with the generator frozen,<br>
+and improves DiT, SiT + REPA, LightningDiT, REPA-E and PixArt-&alpha; with the same sampling pipeline and no extra inference cost.
 
-<img src="assets/teaser.png" width="720">
+<img src="assets/teaser.png" width="560">
 
 </div>
 
