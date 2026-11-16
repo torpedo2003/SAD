@@ -53,7 +53,7 @@ Fine-tuning a decoder on generated latents runs into two problems. SAD has one m
 2. **Without pairs, the decoder drifts away from the latent space** and forgets how to reconstruct.
    → *Encoder Anchor Preservation (EAP)* keeps the decoder close to the original one on encoder latents with a simple L1 anchor.
 
-<div align="center"><img src="assets/method.png" width="900"></div>
+<div align="center"><img src="assets/method.png" width="100%"></div>
 
 ### The "aha" part: where you align matters
 
