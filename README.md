@@ -71,7 +71,7 @@ pip install -r requirements.txt
 python demo.py                      # decodes the 8 latents shown above with D_0 and SAD -> assets/demo.jpg
 ```
 
-Use a SAD decoder in your own pipeline. Only the decoder weights change:
+Use a SAD decoder in your own pipeline (`pip install git+https://github.com/torpedo2003/SAD` installs only the loader). Only the decoder weights change:
 
 ```python
 from diffusers import DiTPipeline
@@ -97,7 +97,7 @@ generator and sampler; use the one that matches your pipeline.
 | `sit-xl2-repa-256/sad-gan` | SiT-XL/2 + REPA | SD-VAE | SDE 250 steps |
 | `lightningdit-xl-vavae-256/sad-gan` | LightningDiT-XL | VA-VAE | official recipe |
 | `repa-e-e2evae-256/sad-gan` | REPA-E (SiT-XL/1) | E2E-VAE | SDE 250 steps |
-| `pixart-alpha-256/sad-gan` | PixArt-α 256px | SD-VAE | as in the paper |
+| `pixart-alpha-256/sad-gan` | PixArt-α 256px | SD-VAE | 20 steps, guidance 4.5 |
 
 The VA-VAE and E2E-VAE decoders load into the autoencoder classes of the
 [LightningDiT](https://github.com/hustvl/LightningDiT) and [REPA-E](https://github.com/End2End-Diffusion/REPA-E) code bases
