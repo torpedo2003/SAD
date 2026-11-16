@@ -8,7 +8,7 @@
 
 <a href="https://torpedo2003.github.io/SAD/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project page"></a>
 <a href="#"><img src="https://img.shields.io/badge/arXiv-coming%20soon-b31b1b" alt="arXiv"></a>
-<a href="https://huggingface.co/torpedo2003/SAD"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Decoders-yellow" alt="Hugging Face"></a>
+<a href="https://huggingface.co/torpedo2003/SAD"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Weights-yellow" alt="Hugging Face"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green" alt="License"></a>
 
 The decoder of a latent generative model never sees generated latents in training.<br>
