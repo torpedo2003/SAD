@@ -75,21 +75,24 @@
     <div class="content has-text-justified">
       <p>
         Latent generative models synthesize images by decoding generated latents, yet their decoder is trained only to
-        reconstruct encoder latents and never sees the latents it decodes at test time. This train&ndash;test mismatch renders
-        the residual errors of the generator directly into the final image. The decoder is the most direct and least
-        expensive place to correct them, but doing so faces two core challenges: (1) <b>unpaired supervision</b>, since a
-        generated latent has no ground-truth image, and (2) <b>latent-space drift</b>, since a decoder freed from paired
-        targets forgets the latent space it must keep decoding.
+        reconstruct encoder latents and never sees the latents it decodes at test time, so the residual errors of the
+        generator are rendered directly into the final image. Existing remedies retrain the generator, add cost at every
+        sampling step, or make the decoder robust to perturbed real latents, assuming that generator errors resemble such
+        perturbations. We find that they do not: generated latents lie on the encoder latent manifold as closely as real
+        ones, yet follow a different distribution. The decoder should therefore be adapted to the distribution of
+        generated latents, which raises two challenges: (1) <b>unpaired supervision</b>, since a generated latent has no
+        ground-truth image, and (2) <b>latent-space drift</b>, since a decoder freed from paired targets forgets the latent
+        space it must decode.
       </p>
       <p>
-        To address them, we propose <b>Sample-Aligned Decoders (SAD)</b>, a post-training framework that fine-tunes only the
-        decoder of a frozen generator at no inference cost. It consists of two modules: <i>Generated-Sample Distribution
-        Alignment</i>, which matches decoded generated latents to unpaired real images in a frozen foundation-model feature
-        space, and <i>Encoder Anchor Preservation</i>, which keeps the decoder close to the original one on encoder latents.
-        Our analysis shows that the alignment must act on generated latents, where the correction is weighted by the density
-        ratio between generated and encoder latents; on encoder latents it can only work against the anchor. Extensive
-        experiments show that SAD consistently improves four state-of-the-art ImageNet generators (DiT-XL/2, SiT, LightningDiT and REPA-E) across three tokenizers, complements discriminator guidance, and extends to
-        text-to-image generation.
+        We propose <b>Sample-Aligned Decoders (SAD)</b>, a post-training framework that fine-tunes only the decoder of a
+        frozen generator at no inference cost. <i>Generated-Sample Distribution Alignment</i> matches decoded generated
+        latents to unpaired real images in a frozen foundation-model feature space, and <i>Encoder Anchor Preservation</i>
+        keeps the decoder close to the original one on encoder latents. Our analysis shows that the alignment is effective
+        only on generated latents, where it corrects each sample in proportion to how much more often the generator
+        produces such latents than the encoder; on encoder latents it can only work against the anchor. SAD improves four
+        state-of-the-art ImageNet generators across three tokenizers, e.g., FID-50K from 1.15 to 0.98 for REPA-E,
+        complements discriminator guidance, and extends to text-to-image generation.
       </p>
     </div>
   </div>
