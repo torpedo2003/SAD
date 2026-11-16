@@ -129,6 +129,19 @@ The VA-VAE and E2E-VAE decoders load into the autoencoder classes of the
 [LightningDiT](https://github.com/hustvl/LightningDiT) and [REPA-E](https://github.com/End2End-Diffusion/REPA-E) code bases
 with the same `load_sad_decoder` call.
 
+## FAQ
+
+**Does SAD change what is generated?** No. The generator, the sampler and the latent are unchanged, so content and layout stay the
+same. SAD changes how a latent is rendered: texture, color cast, exposure and local statistics.
+
+**Does it cost anything at inference?** No. The fine-tuned decoder has the same architecture as the original one.
+
+**Can I train SAD for my own generator?** Yes. You need a cache of generated latents (16k–40k), a few thousand unpaired real
+images and about one GPU-hour. See [`training/`](training/README.md) and `training/scripts/run_examples.sh`.
+
+**What doesn't it do?** It cannot add diversity or repair a wrong structure that the generator produced, and a decoder is specific
+to its generator and sampler family.
+
 ## Training and evaluation
 
 [`training/`](training/README.md) contains the full code used in the paper: latent caching for every generator, SAD training
