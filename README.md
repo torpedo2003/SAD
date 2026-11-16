@@ -76,7 +76,7 @@ but **learned once in the decoder weights** instead of paid for at every samplin
 ```bash
 git clone https://github.com/torpedo2003/SAD && cd SAD
 pip install -r requirements.txt
-python demo.py                      # writes assets/demo.png: top row D_0, bottom row SAD, same latents
+python demo.py                      # writes assets/demo.png: D_0 vs. SAD on the same latents
 ```
 
 Use a SAD decoder in your own pipeline. Only the decoder weights change:
@@ -90,7 +90,7 @@ load_sad_decoder(pipe.vae, "dit-xl2-256/sad-gan")   # downloads from Hugging Fac
 images = pipe(class_labels=[279, 388], num_inference_steps=250, guidance_scale=1.5).images
 ```
 
-<div align="center"><img src="assets/demo.png" width="720"><br><sub>Same DiT-XL/2 latents. Top: original decoder. Bottom: SAD.</sub></div>
+<div align="center"><img src="assets/comparison.jpg" width="100%"><br><sub>Same DiT-XL/2 latents (50-step DPM-Solver++). Top: original decoder D<sub>0</sub>. Middle: SAD. Bottom: per-pixel difference (brighter is larger). SAD keeps content and layout and corrects color cast, exposure and texture.</sub></div>
 
 ## Model zoo
 
