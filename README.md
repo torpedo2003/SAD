@@ -22,7 +22,8 @@ It improves DiT, SiT, LightningDiT, REPA-E and PixArt-&alpha; at no extra infere
 ## Overview
 
 The decoder of a latent generative model is trained on encoder latents but decodes generated latents at test time.
-SAD fine-tunes only this decoder in about one GPU-hour, with two losses:
+Generated latents lie on the encoder latent manifold as closely as real ones, yet follow a different distribution (a small classifier separates them with AUC 0.96), so their errors are not the perturbations that robust decoders are trained for.
+SAD therefore adapts the decoder to the distribution of generated latents. It fine-tunes only the decoder in about one GPU-hour, with two losses:
 
 - **Generated-Sample Distribution Alignment (GSA)** aligns decoded generated latents with unpaired real images in a frozen DINOv2 feature space.
 - **Encoder Anchor Preservation (EAP)** keeps the decoder close to the original one on encoder latents, so reconstruction is preserved.
@@ -39,7 +40,7 @@ FID-50K with the ADM evaluator. For each released generator, the first row uses 
 
 ### Discriminator guidance
 
-Decoder-side (SAD) vs. generator-side (DG) correction on DiT-XL/2 (official recipe, guidance 1.5). SAD needs no extra sampling and only 5k real images, and it stacks with discriminator guidance (DG).
+Decoder-side (SAD) vs. generator-side (DG) correction on DiT-XL/2 (official sampler, guidance 1.5). SAD needs no extra sampling and only 5k real images, and it stacks with discriminator guidance (DG).
 
 <div align="center"><img src="assets/table_dg.png" width="60%"></div>
 
