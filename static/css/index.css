@@ -1,0 +1,19 @@
+body { font-family: 'Noto Sans', sans-serif; color: #2b2b2b; }
+.publication-title { font-family: 'Castoro', serif; line-height: 1.2; }
+.publication-authors { margin-top: .6rem; }
+.publication-authors a { color: hsl(204, 86%, 45%) !important; }
+.author-block { display: inline-block; margin: 0 .25rem; }
+.publication-links { margin-top: 1.4rem; display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; }
+.teaser img { max-width: 720px; margin: 0 auto; border-radius: 8px; }
+.caption { max-width: 760px; margin: .8rem auto 0; font-size: .98rem; color: #4a4a4a; }
+.section-alt { background: #f6f8fb; }
+.wide img { border-radius: 6px; background: white; }
+.box { height: 100%; }
+.tinted-blue { background: #eef5fd; border-left: 4px solid #548dd4; }
+.tinted-green { background: #f1f8ed; border-left: 4px solid #6aa84f; }
+.slider { width: 100%; border-radius: 8px; --divider-width: 2px; --divider-color: #fff; --default-handle-opacity: .9; }
+.slider img { display: block; width: 100%; height: auto; }
+.compare-label { text-align: center; font-size: .9rem; margin-top: .35rem; color: #555; }
+.stats .stat { font-size: 1.5rem; font-family: 'Castoro', serif; }
+.stats .stat b { color: #d68f18; }
+pre { background: #f0f0f0; border-radius: 6px; }

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sample-Aligned Decoders (SAD) fine-tune only the decoder of a frozen latent generator on its own generated latents, improving state-of-the-art image generators at no inference cost.">
+  <meta name="keywords" content="latent generative models, diffusion models, VAE decoder, post-training, distribution alignment">
+  <title>Sample-Aligned Decoders for Latent Generative Models</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Castoro&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8.0.6/dist/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8.0.6/dist/styles.css">
+  <link rel="stylesheet" href="static/css/index.css">
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title is-1 publication-title">Sample-Aligned Decoders<br>for Latent Generative Models</h1>
+      <div class="is-size-5 publication-authors">
+        <!-- TODO: replace with the real author list and personal pages -->
+        <span class="author-block"><a href="#">Author One</a><sup>1</sup>,</span>
+        <span class="author-block"><a href="#">Author Two</a><sup>1</sup>,</span>
+        <span class="author-block"><a href="#">Author Three</a><sup>2</sup></span>
+      </div>
+      <div class="is-size-5 publication-authors">
+        <span class="author-block"><sup>1</sup>Affiliation One,</span>
+        <span class="author-block"><sup>2</sup>Affiliation Two</span>
+      </div>
+
+      <div class="publication-links">
+        <!-- TODO: replace # with the arXiv abstract URL once available -->
+        <a href="#" class="button is-dark is-rounded">
+          <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper</span>
+        </a>
+        <a href="#" class="button is-dark is-rounded">
+          <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
+        </a>
+        <a href="https://github.com/torpedo2003/SAD" class="button is-dark is-rounded">
+          <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+        </a>
+        <a href="https://huggingface.co/torpedo2003/SAD" class="button is-dark is-rounded">
+          <span class="icon">&#129303;</span><span>Weights</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section pt-0">
+  <div class="container is-max-desktop">
+    <figure class="image teaser">
+      <img src="static/images/teaser.png" alt="Motivation of SAD">
+    </figure>
+    <p class="has-text-centered caption">
+      <b>TL;DR.</b> The decoder of a latent generative model is trained only on encoder latents, but at test time it decodes
+      generated latents. SAD fine-tunes only the decoder on the generator's own samples and improves every
+      generator we tested, at no inference cost.
+    </p>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Abstract</h2>
+    <div class="content has-text-justified">
+      <p>
+        Latent generative models synthesize images by decoding generated latents, yet their decoder is trained only to
+        reconstruct encoder latents and never sees the latents it decodes at test time. This train&ndash;test mismatch renders
+        the residual errors of the generator directly into the final image. The decoder is the most direct and least
+        expensive place to correct them, but doing so faces two core challenges: (1) <b>unpaired supervision</b>, since a
+        generated latent has no ground-truth image, and (2) <b>latent-space drift</b>, since a decoder freed from paired
+        targets forgets the latent space it must keep decoding.
+      </p>
+      <p>
+        To address them, we propose <b>Sample-Aligned Decoders (SAD)</b>, a post-training framework that fine-tunes only the
+        decoder of a frozen generator at no inference cost. It consists of two modules: <i>Generated-Sample Distribution
+        Alignment</i>, which matches decoded generated latents to unpaired real images in a frozen foundation-model feature
+        space, and <i>Encoder Anchor Preservation</i>, which keeps the decoder close to the original one on encoder latents.
+        Our analysis shows that the alignment must act on generated latents, where the correction is weighted by the density
+        ratio between generated and encoder latents; on encoder latents it can only work against the anchor. Extensive
+        experiments show that SAD consistently improves four state-of-the-art ImageNet generators (DiT-XL/2, SiT-XL/2 with
+        REPA, LightningDiT and REPA-E) across three tokenizers, complements discriminator guidance, and extends to
+        text-to-image generation.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Method</h2>
+    <figure class="image wide">
+      <img src="static/images/method.png" alt="Overview of SAD">
+    </figure>
+    <div class="columns mt-4">
+      <div class="column">
+        <div class="box tinted-blue">
+          <h3 class="title is-5">Generated-Sample Distribution Alignment</h3>
+          <p>A one-time cache of generated latents is decoded and aligned with <b>unpaired</b> real images in a frozen
+            DINOv2 feature space (GAN, MMD or Fr&eacute;chet discrepancy). No generated latent needs a ground-truth image.</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box tinted-green">
+          <h3 class="title is-5">Encoder Anchor Preservation</h3>
+          <p>An L1 anchor keeps the decoder close to the original decoder on encoder latents, so reconstruction is preserved
+            and the decoder does not overfit the alignment space.</p>
+        </div>
+      </div>
+    </div>
+    <p class="content">
+      Training takes 2,000 steps, about one GPU-hour, and never back-propagates through the generator. At inference the
+      fine-tuned decoder simply replaces the original one, so the sampling pipeline and its cost are unchanged.
+    </p>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Same latent, only the decoder changes</h2>
+    <p class="has-text-centered mb-5">Drag the slider: left is the original decoder <b>D<sub>0</sub></b>, right is <b>SAD</b>.</p>
+    <div class="columns is-multiline compare-grid" id="compare-grid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Results on ImageNet 256&times;256</h2>
+    <figure class="image wide">
+      <img src="static/images/results_table.png" alt="Comparison with state-of-the-art generators">
+    </figure>
+    <div class="columns has-text-centered mt-4 stats">
+      <div class="column"><p class="stat">1.15 &rarr; <b>0.98</b></p><p>FID-50K, REPA-E</p></div>
+      <div class="column"><p class="stat">1.38 &rarr; <b>1.23</b></p><p>FID-50K, LightningDiT</p></div>
+      <div class="column"><p class="stat">2.30 &rarr; <b>2.13</b></p><p>FID-50K, DiT-XL/2</p></div>
+      <div class="column"><p class="stat">&minus;32%</p><p>FID, PixArt-&alpha; text-to-image</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">BibTeX</h2>
+    <!-- TODO: fill in authors and the arXiv identifier -->
+    <pre><code>@article{sad2026,
+  title   = {Sample-Aligned Decoders for Latent Generative Models},
+  author  = {Author One and Author Two and Author Three},
+  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  year    = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container has-text-centered is-size-7">
+    <p>This page is adapted from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page
+      template, licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+  </div>
+</footer>
+
+<script>
+  const pairs = [
+    ["wolf", "DiT-XL/2 · white wolf"], ["samoyed", "DiT-XL/2 · Samoyed"], ["bullterrier", "DiT-XL/2 · Staffordshire bullterrier"],
+    ["suit", "DiT-XL/2 · suit"], ["carbonara", "DiT-XL/2 · carbonara"], ["dough", "DiT-XL/2 · dough"],
+    ["grouse", "DiT-XL/2 · black grouse"], ["chow", "DiT-XL/2 · chow"], ["orange", "DiT-XL/2 · guidance 4.0"],
+    ["ldit_cockatoo", "LightningDiT-XL"], ["repae_pretzel", "REPA-E"], ["pixart_hydrant", "PixArt-α (text-to-image)"]
+  ];
+  const grid = document.getElementById("compare-grid");
+  for (const [k, label] of pairs) {
+    const col = document.createElement("div");
+    col.className = "column is-one-third-desktop is-half-tablet";
+    col.innerHTML = `
+      <img-comparison-slider class="slider">
+        <img slot="first" src="static/images/compare/${k}_d0.jpg" alt="D0" loading="lazy">
+        <img slot="second" src="static/images/compare/${k}_sad.jpg" alt="SAD" loading="lazy">
+      </img-comparison-slider>
+      <p class="compare-label">${label}</p>`;
+    grid.appendChild(col);
+  }
+</script>
+</body>
+</html>
