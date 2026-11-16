@@ -57,15 +57,14 @@ Pick: share of samples preferred by PickScore over D<sub>0</sub>.
 
 ### Qualitative results
 
-<div align="center"><img src="assets/comparison.jpg" width="100%"><br><sub>Same DiT-XL/2 latents (50-step DPM-Solver++). Top: original decoder D<sub>0</sub>. Middle: SAD. Bottom: per-pixel difference (brighter is larger). SAD keeps content and layout and corrects color cast, exposure and texture. The latents are in <code>assets/showcase_latents.npz</code>; <code>python reproduce_readme_figure.py</code> regenerates this figure.</sub></div>
+<div align="center"><img src="assets/comparison.jpg" width="100%"><br><sub>Same DiT-XL/2 latents (50-step DPM-Solver++). Top: original decoder D<sub>0</sub>. Middle: SAD. Bottom: per-pixel difference (brighter is larger). SAD keeps content and layout and corrects color cast, exposure and texture. The latents are in <code>assets/showcase_latents.npz</code>; <code>python demo.py</code> regenerates this figure.</sub></div>
 
 ## Quick start
 
 ```bash
 git clone https://github.com/torpedo2003/SAD && cd SAD
 pip install -r requirements.txt
-python reproduce_readme_figure.py   # decodes the 8 latents below with D_0 and SAD -> assets/comparison_reproduced.jpg
-python demo.py                      # samples new DiT-XL/2 latents and decodes them with D_0 and SAD -> assets/demo.png
+python demo.py                      # decodes the 8 latents shown above with D_0 and SAD -> assets/demo.jpg
 ```
 
 Use a SAD decoder in your own pipeline. Only the decoder weights change:
