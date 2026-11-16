@@ -31,21 +31,21 @@ SAD fine-tunes only this decoder in about one GPU-hour, with two losses:
 
 ## Results
 
-### ImageNet 256×256 (FID-50K, ADM evaluator)
+### ImageNet 256×256
 
-For each released generator: the reported result (gray), our evaluation with the original decoder D<sub>0</sub>, and SAD on the same latents.
+FID-50K with the ADM evaluator. For each released generator: the reported result (gray), our evaluation with the original decoder D<sub>0</sub>, and SAD on the same latents.
 
 <div align="center"><img src="assets/table_sota.png" width="90%"></div>
 
-### Decoder-side vs. generator-side correction
+### Discriminator guidance
 
-DiT-XL/2, official recipe, guidance 1.5. SAD needs no extra sampling and only 5k real images, and it stacks with discriminator guidance (DG).
+Decoder-side (SAD) vs. generator-side (DG) correction on DiT-XL/2 (official recipe, guidance 1.5). SAD needs no extra sampling and only 5k real images, and it stacks with discriminator guidance (DG).
 
 <div align="center"><img src="assets/table_dg.png" width="60%"></div>
 
-### Comparison with other decoder adaptations
+### Decoder adaptations
 
-DiT-XL/2, 50-step DPM-Solver++, 10k samples. FD<sub>CLIP</sub> and rFID are not used in training. \*FDDA optimizes Inception features, the network used by FID.
+Compared with other decoder adaptations on DiT-XL/2 (50-step DPM-Solver++, 10k samples). FD<sub>CLIP</sub> and rFID are not used in training. \*FDDA optimizes Inception features, the network used by FID.
 
 <div align="center"><img src="assets/table_adapt.png" width="65%"></div>
 
@@ -53,13 +53,13 @@ DiT-XL/2, 50-step DPM-Solver++, 10k samples. FD<sub>CLIP</sub> and rFID are not 
 
 <div align="center"><img src="assets/table_ablation.png" width="65%"></div>
 
-### Text-to-image (PixArt-α, COCO, 10k samples)
+### Text-to-image
 
-Pick: share of samples preferred by PickScore over D<sub>0</sub>.
+PixArt-α on COCO, 10k samples. Pick: share of samples preferred by PickScore over D<sub>0</sub>.
 
 <div align="center"><img src="assets/table_t2i.png" width="58%"></div>
 
-### Qualitative results
+### Qualitative
 
 <div align="center"><img src="assets/comparison.jpg" width="100%"><br><sub>Same DiT-XL/2 latents (50-step DPM-Solver++). Top: original decoder D<sub>0</sub>. Middle: SAD. Bottom: per-pixel difference (brighter is larger). SAD keeps content and layout and corrects color cast, exposure and texture.</sub></div>
 
