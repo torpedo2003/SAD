@@ -22,7 +22,7 @@
     <div class="container is-max-desktop has-text-centered">
       <h1 class="title is-1 publication-title">Sample-Aligned Decoders<br>for Latent Generative Models</h1>
       <div class="is-size-5 publication-authors">
-        <span class="author-block">Yu Lei<sup>1</sup>,</span>
+        <span class="author-block">Yu Lei<sup>1,3</sup>,</span>
         <span class="author-block">Yi Li<sup>1</sup>,</span>
         <span class="author-block">Hongcheng Gao<sup>2</sup>,</span>
         <span class="author-block">Yipeng Wei<sup>1</sup>,</span>
@@ -143,6 +143,114 @@
       <div class="column"><p class="stat">1.38 &rarr; <b>1.23</b></p><p>FID-50K, LightningDiT</p></div>
       <div class="column"><p class="stat">2.30 &rarr; <b>2.13</b></p><p>FID-50K, DiT-XL/2</p></div>
       <div class="column"><p class="stat">&minus;32%</p><p>FID, PixArt-&alpha; text-to-image</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Decoder-side vs. generator-side correction</h2>
+    <p class="mb-4">Discriminator guidance (DG) corrects samples at every sampling step; SAD learns the correction once in the decoder.
+      SAD gets more than half of DG's FID gain with no extra sampling cost and 5k instead of 1.28M real images, and the two stack.
+      DiT-XL/2, official recipe, guidance 1.5, FID-50K.</p>
+    <div class="table-container">
+    <table class="table is-fullwidth is-narrow is-hoverable res">
+      <thead><tr><th>Method</th><th>Extra sampling</th><th>Real images</th><th>FID&darr;</th><th>sFID&darr;</th><th>IS&uarr;</th></tr></thead>
+      <tbody>
+        <tr><td>D<sub>0</sub></td><td>&ndash;</td><td>&ndash;</td><td>2.30</td><td>4.51</td><td>277.8</td></tr>
+        <tr><td>DG</td><td>+20%</td><td>1.28M</td><td>2.01</td><td>4.49</td><td>266.5</td></tr>
+        <tr class="ours"><td>SAD (ours)</td><td>0</td><td>5k</td><td>2.13</td><td>4.25</td><td><b>280.5</b></td></tr>
+        <tr class="ours"><td>DG + SAD (ours)</td><td>+20%</td><td>1.28M</td><td><b>1.86</b></td><td><b>4.02</b></td><td>269.3</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Comparison with other ways to change the decoder</h2>
+    <p class="mb-4">Same DiT-XL/2 latents (50-step DPM-Solver++, 10k samples, held-out reference). Re-training the decoder or making it
+      robust to perturbed latents does not help; aligning with real images does, and SAD gives the best held-out FD<sub>CLIP</sub>
+      and the best reconstruction. FDDA optimizes Inception features, the network FID itself uses, and more than doubles rFID.</p>
+    <div class="table-container">
+    <table class="table is-fullwidth is-narrow is-hoverable res">
+      <thead><tr><th>Method</th><th>FID&darr;</th><th>FD<sub>CLIP</sub>&darr;</th><th>rFID&darr;</th><th>PSNR&uarr;</th></tr></thead>
+      <tbody>
+        <tr><td>Original decoder D<sub>0</sub></td><td>13.32</td><td>51.4</td><td>2.63</td><td>23.91</td></tr>
+        <tr class="grp"><td colspan="5"><i>Replacing or re-training the decoder</i></td></tr>
+        <tr><td>sd-vae-ft-mse</td><td>13.40</td><td>51.8</td><td>2.91</td><td><b>24.75</b></td></tr>
+        <tr><td>Consistency Decoder</td><td>13.18</td><td>57.3</td><td>3.34</td><td>23.31</td></tr>
+        <tr><td>Fine-tuning, &#8467;<sub>1</sub>+LPIPS+GAN</td><td>13.40</td><td>48.6</td><td>7.02</td><td>24.51</td></tr>
+        <tr class="grp"><td colspan="5"><i>Robustness to perturbed latents</i></td></tr>
+        <tr><td>Noise-robust decoder</td><td>13.40</td><td>51.6</td><td>2.67</td><td>24.02</td></tr>
+        <tr><td>Paired post-training</td><td>13.10</td><td>50.8</td><td>2.59</td><td>23.91</td></tr>
+        <tr class="grp"><td colspan="5"><i>Alignment to real images</i></td></tr>
+        <tr><td>Pixel refiner after D<sub>0</sub></td><td>12.54</td><td>45.3</td><td>2.63</td><td>23.86</td></tr>
+        <tr><td>FDDA (Inception in the objective)</td><td><b>12.21</b></td><td>52.1</td><td>5.91</td><td>21.16</td></tr>
+        <tr class="ours"><td>SAD-GAN (ours)</td><td>12.36</td><td>42.4</td><td><b>2.56</b></td><td>23.92</td></tr>
+        <tr class="ours"><td>SAD-MMD (ours)</td><td>12.68</td><td><b>41.6</b></td><td>2.57</td><td>23.92</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Where you align matters</h2>
+    <div class="columns is-vcentered">
+      <div class="column is-7"><figure class="image"><img src="static/images/analysis.png" alt="Where GSA is applied"></figure></div>
+      <div class="column is-5">
+        <p><b>(a)</b> Every decoder we trained, placed by generation FID and reconstruction rFID. Aligning on generated latents
+          (orange) lowers FID at unchanged rFID; the same loss on encoder latents (red) only breaks reconstruction.</p>
+        <p class="mt-3"><b>(b)</b> Decoded DiT samples lack high-frequency energy compared with real images. SAD recovers about half of the gap.</p>
+      </div>
+    </div>
+    <div class="table-container mt-4">
+    <table class="table is-fullwidth is-narrow is-hoverable res">
+      <thead><tr><th>Ablation (DiT-XL/2, 50-step DPM-Solver++)</th><th>FID&darr;</th><th>FD<sub>CLIP</sub>&darr;</th><th>rFID&darr;</th><th>PSNR&uarr;</th></tr></thead>
+      <tbody>
+        <tr><td>D<sub>0</sub></td><td>13.32</td><td>51.4</td><td>2.63</td><td>23.91</td></tr>
+        <tr><td>w/o GSA (anchor only)</td><td>13.31</td><td>49.9</td><td>2.65</td><td>23.92</td></tr>
+        <tr><td>GSA on E(x) instead of z<sub>gen</sub></td><td>13.59</td><td>51.5</td><td>7.70</td><td>23.90</td></tr>
+        <tr><td>w/o EAP</td><td>13.06</td><td>50.3</td><td>5.06</td><td>21.92</td></tr>
+        <tr class="ours"><td>SAD (GSA + EAP)</td><td><b>12.36</b></td><td><b>42.4</b></td><td><b>2.56</b></td><td><b>23.92</b></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns">
+      <div class="column">
+        <h2 class="title is-4">Color and exposure</h2>
+        <p class="mb-3">D<sub>0</sub> renders DiT samples over-saturated and clips about twice as many pixels as real images.
+          SAD brings these statistics back to those of real images, although no term in its objective targets color.</p>
+        <table class="table is-fullwidth is-narrow res">
+          <thead><tr><th></th><th>Real</th><th>D<sub>0</sub></th><th>SAD</th></tr></thead>
+          <tbody>
+            <tr><td>Saturation</td><td>0.323</td><td>0.375</td><td><b>0.324</b></td></tr>
+            <tr><td>Colorfulness</td><td>42.0</td><td>47.8</td><td><b>41.3</b></td></tr>
+            <tr><td>Clipped highlights</td><td>4.8%</td><td>9.4%</td><td><b>5.9%</b></td></tr>
+            <tr><td>Clipped shadows</td><td>1.4%</td><td>4.1%</td><td><b>1.9%</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="column">
+        <h2 class="title is-4">Text-to-image (PixArt-&alpha;)</h2>
+        <p class="mb-3">COCO, 10k samples. The same recipe lowers FID by 32% and raises recall, while the CLIP score is preserved.</p>
+        <table class="table is-fullwidth is-narrow res">
+          <thead><tr><th>Decoder</th><th>FID&darr;</th><th>FD<sub>CLIP</sub>&darr;</th><th>CLIP&uarr;</th><th>Recall&uarr;</th></tr></thead>
+          <tbody>
+            <tr><td>D<sub>0</sub></td><td>34.73</td><td>209.1</td><td>26.03</td><td>0.286</td></tr>
+            <tr class="ours"><td>SAD, GAN &lambda;=0.01</td><td><b>23.55</b></td><td>141.6</td><td><b>26.91</b></td><td><b>0.416</b></td></tr>
+            <tr class="ours"><td>SAD, MMD &lambda;=0.3</td><td>26.19</td><td><b>125.1</b></td><td>26.66</td><td>0.364</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </section>

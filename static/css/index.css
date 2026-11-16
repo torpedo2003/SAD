@@ -17,3 +17,8 @@ body { font-family: 'Noto Sans', sans-serif; color: #2b2b2b; }
 .stats .stat { font-size: 1.5rem; font-family: 'Castoro', serif; }
 .stats .stat b { color: #d68f18; }
 pre { background: #f0f0f0; border-radius: 6px; }
+.wide img { width: 100%; }
+.res td, .res th { text-align: center; vertical-align: middle; }
+.res td:first-child, .res th:first-child { text-align: left; }
+.res tr.ours { background: #eaf2fb; }
+.res tr.grp td { background: #fafafa; color: #666; font-size: .9rem; }
