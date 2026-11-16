@@ -2,7 +2,7 @@
 
 # Sample-Aligned Decoders for Latent Generative Models
 
-Yu Lei<sup>1,2</sup>, Yi Li<sup>2</sup>, Hongcheng Gao<sup>3</sup>, Yipeng Wei<sup>2</sup>, Liang Li<sup>1</sup>, Li Su<sup>2</sup>, Qingming Huang<sup>2</sup>
+[Yu Lei](https://torpedo2003.github.io/)<sup>1,2</sup>, [Yi Li](#)<sup>2</sup>, [Hongcheng Gao](#)<sup>3</sup>, [Yipeng Wei](#)<sup>2</sup>, [Liang Li](#)<sup>1</sup>, [Li Su](#)<sup>2</sup>, [Qingming Huang](#)<sup>2</sup>
 
 <sup>1</sup>Institute of Computing Technology, Chinese Academy of Sciences &nbsp; <sup>2</sup>University of Chinese Academy of Sciences &nbsp; <sup>3</sup>Tsinghua University
 
