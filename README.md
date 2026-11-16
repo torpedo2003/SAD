@@ -118,7 +118,7 @@ to its generator and sampler family.
 
 ## Training and evaluation
 
-[`training/`](training/README.md) has the training code and a short guide. In short:
+[`training/`](training/README.md) has the training code and a detailed guide. In short:
 
 ```bash
 cd training
