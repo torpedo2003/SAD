@@ -140,9 +140,9 @@ python fid50k.py --ckpt runs/sad_gan/decoder.pt --set dit50k_cfg1.5 --ref_split_
 ## Citation
 
 ```bibtex
-@article{sad2026,
+@article{lei2026sad,
   title   = {Sample-Aligned Decoders for Latent Generative Models},
-  author  = {TBD},
+  author  = {Lei, Yu and Li, Yi and Gao, Hongcheng and Wei, Yipeng and Li, Liang and Su, Li and Huang, Qingming},
   journal = {arXiv preprint},
   year    = {2026}
 }
