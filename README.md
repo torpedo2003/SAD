@@ -7,69 +7,84 @@
 <a href="https://huggingface.co/torpedo2003/SAD"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Decoders-yellow" alt="Hugging Face"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green" alt="License"></a>
 
-**Your decoder has never seen the latents it decodes. SAD fixes that, with one GPU-hour and zero inference cost.**
+Fine-tune only the decoder of a frozen latent generator on its own samples: better images, same sampling pipeline, no extra inference cost.
 
 <img src="assets/teaser.png" width="720">
 
 </div>
 
-## TL;DR
+## Overview
 
-Every latent generative model ends with a decoder, and that decoder was trained **only on encoder latents** `E(x)`.
-At sampling time it decodes **generated latents** `z_gen`, which it has never seen.
-The generator's small residual errors therefore go straight into the final image.
+The decoder of a latent generative model is trained on encoder latents but decodes generated latents at test time.
+SAD fine-tunes only this decoder in about one GPU-hour, with two losses:
 
-**SAD** fine-tunes only the decoder, on the generator's own samples, and leaves everything else untouched:
-
-| | before | after SAD |
-|---|---|---|
-| REPA-E (FID-50K) | 1.15 | **0.98** |
-| LightningDiT-XL (FID-50K) | 1.38 | **1.23** |
-| DiT-XL/2 (FID-50K) | 2.30 | **2.13** |
-| DiT-XL/2 + discriminator guidance (FID-50K) | 1.83 | **1.69** |
-| PixArt-α, text-to-image (FID, COCO) | 34.7 | **23.6** |
-| inference cost | 1× | **1×** (same network, new weights) |
-| training cost | – | **~1 GPU-hour**, generator frozen |
-
-## The idea in three lines
-
-```
-training :  x ──E──▶ E(x) ──D──▶ x̂          the decoder only ever sees encoder latents
-sampling :  noise ──G──▶ z_gen ──D──▶ image   ...but this is what it decodes in practice
-SAD      :  fine-tune D on z_gen, so the last network in the pipeline is aligned with the samples it actually gets
-```
-
-Generators are trained for hundreds of GPU-days to match the latent distribution, and they never match it exactly.
-Rather than squeezing out more from the generator, SAD asks a simpler question: **why not let the decoder absorb the remaining error?**
-The decoder is small (about 7% of DiT-XL/2), runs once per sample, and no gradient ever needs to flow through the generator.
-
-## Why this is not trivial
-
-Fine-tuning a decoder on generated latents runs into two problems. SAD has one module for each.
-
-1. **There is no target image for a generated latent.**
-   → *Generated-Sample Distribution Alignment (GSA)* matches the **distribution** of decoded samples to **unpaired** real images
-   in a frozen DINOv2 feature space (GAN, MMD or Fréchet discrepancy). No pairs needed.
-2. **Without pairs, the decoder drifts away from the latent space** and forgets how to reconstruct.
-   → *Encoder Anchor Preservation (EAP)* keeps the decoder close to the original one on encoder latents with a simple L1 anchor.
+- **Generated-Sample Distribution Alignment (GSA)** aligns decoded generated latents with unpaired real images in a frozen DINOv2 feature space.
+- **Encoder Anchor Preservation (EAP)** keeps the decoder close to the original one on encoder latents, so reconstruction is preserved.
 
 <div align="center"><img src="assets/method.png" width="100%"></div>
 
-### The "aha" part: where you align matters
+## Results
 
-The obvious alternative is to fine-tune the decoder with the same distribution loss on **encoder** latents, where pairs exist.
-It does not work: FID stays the same or gets worse, and reconstruction breaks (rFID 2.63 → 7.70).
-Our analysis explains why (Prop. 1–2 in the paper):
+### ImageNet 256×256 (FID-50K, ADM evaluator)
 
-- On encoder latents, the alignment is a **zero-sum game** against the anchor: any decoder that keeps the anchor has the same
-  alignment loss as the original one. There is nothing to gain.
-- On generated latents, the optimal correction is **weighted by the density ratio** `r(z) = q(z) / p_E(z)` between generated
-  and encoder latents. The decoder changes exactly where the generator puts mass that the encoder does not, which is where the
-  errors are.
+The same generated latents are decoded by the original decoder D<sub>0</sub> (reproduced) and by SAD.
 
-In other words, SAD is a discriminator-driven refinement of every sample, like discriminator guidance,
-but **learned once in the decoder weights** instead of paid for at every sampling step. That is also why the two combine
-(1.83 → 1.69 FID-50K).
+| Generator | Tokenizer | FID ↓ | sFID ↓ | IS ↑ | Prec. ↑ | Rec. ↑ | FD<sub>CLIP</sub> ↓ |
+|---|---|---|---|---|---|---|---|
+| DiT-XL/2 | SD-VAE | 2.30 → **2.13** | 4.51 → **4.25** | 277.8 → **280.5** | 0.83 → 0.83 | 0.57 → 0.58 | 42.8 → **36.8** |
+| DiT-XL/2 + DG | SD-VAE | 1.83 → **1.69** | 5.13 → **4.24** | 285.3 → **286.2** | 0.78 → 0.79 | 0.63 → 0.63 | 46.4 → **41.0** |
+| SiT-XL/2 + REPA | SD-VAE | 1.43 → **1.38** | 4.67 → **4.00** | 306.7 → 305.4 | 0.79 → 0.79 | 0.64 → 0.64 | 39.9 → **39.4** |
+| LightningDiT-XL | VA-VAE | 1.38 → **1.23** | 4.18 → **3.82** | 291.4 → **294.4** | 0.79 → **0.80** | 0.65 → 0.65 | 29.4 → **28.2** |
+| REPA-E | E2E-VAE | 1.15 → **0.98** | 4.10 → **3.74** | 301.5 → **304.4** | 0.79 → 0.79 | 0.67 → 0.67 | 29.1 → **26.4** |
+
+### Decoder-side vs. generator-side correction
+
+DiT-XL/2, official recipe, guidance 1.5. SAD needs no extra sampling and 5k real images, and it stacks with discriminator guidance (DG).
+
+| Method | Extra sampling | Real images | FID ↓ | sFID ↓ | IS ↑ |
+|---|---|---|---|---|---|
+| D<sub>0</sub> | – | – | 2.30 | 4.51 | 277.8 |
+| DG | +20% | 1.28M | 2.01 | 4.49 | 266.5 |
+| **SAD** | **0** | **5k** | 2.13 | 4.25 | **280.5** |
+| **DG + SAD** | +20% | 1.28M | **1.86** | **4.02** | 269.3 |
+
+### Comparison with other decoder adaptations
+
+DiT-XL/2, 50-step DPM-Solver++, 10k samples; FD<sub>CLIP</sub> and rFID are not used in training.
+
+| Method | FID ↓ | FD<sub>CLIP</sub> ↓ | rFID ↓ | PSNR ↑ |
+|---|---|---|---|---|
+| Original decoder D<sub>0</sub> | 13.32 | 51.4 | 2.63 | 23.91 |
+| sd-vae-ft-mse | 13.40 | 51.8 | 2.91 | 24.75 |
+| Consistency Decoder | 13.18 | 57.3 | 3.34 | 23.31 |
+| Fine-tuning on encoder latents (ℓ1 + LPIPS + GAN) | 13.40 | 48.6 | 7.02 | 24.51 |
+| Noise-robust decoder | 13.40 | 51.6 | 2.67 | 24.02 |
+| Paired post-training | 13.10 | 50.8 | 2.59 | 23.91 |
+| Pixel refiner after D<sub>0</sub> | 12.54 | 45.3 | 2.63 | 23.86 |
+| FDDA (Inception in the objective) | **12.21** | 52.1 | 5.91 | 21.16 |
+| **SAD-GAN** | 12.36 | 42.4 | **2.56** | 23.92 |
+| **SAD-MMD** | 12.68 | **41.6** | 2.57 | 23.92 |
+
+### Ablation
+
+| Variant | FID ↓ | FD<sub>CLIP</sub> ↓ | rFID ↓ |
+|---|---|---|---|
+| D<sub>0</sub> | 13.32 | 51.4 | 2.63 |
+| w/o GSA (anchor only) | 13.31 | 49.9 | 2.65 |
+| GSA on encoder latents E(x) instead of generated latents | 13.59 | 51.5 | 7.70 |
+| w/o EAP | 13.06 | 50.3 | 5.06 |
+| **SAD (GSA + EAP)** | **12.36** | **42.4** | **2.56** |
+
+### Text-to-image (PixArt-α, COCO, 10k samples)
+
+| Decoder | FID ↓ | FD<sub>CLIP</sub> ↓ | CLIP score ↑ | Recall ↑ | rFID ↓ |
+|---|---|---|---|---|---|
+| D<sub>0</sub> | 34.73 | 209.1 | 26.03 | 0.286 | 4.28 |
+| **SAD** (GAN, λ = 0.01) | **23.55** | **141.6** | **26.91** | **0.416** | 4.29 |
+
+### Qualitative results
+
+<div align="center"><img src="assets/comparison.jpg" width="100%"><br><sub>Same DiT-XL/2 latents (50-step DPM-Solver++). Top: original decoder D<sub>0</sub>. Middle: SAD. Bottom: per-pixel difference (brighter is larger). SAD keeps content and layout and corrects color cast, exposure and texture. The latents are in <code>assets/showcase_latents.npz</code>; <code>python reproduce_readme_figure.py</code> regenerates this figure.</sub></div>
 
 ## Quick start
 
@@ -91,7 +106,6 @@ load_sad_decoder(pipe.vae, "dit-xl2-256/sad-gan")   # downloads from Hugging Fac
 images = pipe(class_labels=[279, 388], num_inference_steps=250, guidance_scale=1.5).images
 ```
 
-<div align="center"><img src="assets/comparison.jpg" width="100%"><br><sub>Same DiT-XL/2 latents (50-step DPM-Solver++). Top: original decoder D<sub>0</sub>. Middle: SAD. Bottom: per-pixel difference (brighter is larger). SAD keeps content and layout and corrects color cast, exposure and texture. The latents are in <code>assets/showcase_latents.npz</code>; <code>python reproduce_readme_figure.py</code> regenerates this figure.</sub></div>
 
 ## Model zoo
 
@@ -112,19 +126,6 @@ generator and sampler; use the one that matches your pipeline.
 The VA-VAE and E2E-VAE decoders load into the autoencoder classes of the
 [LightningDiT](https://github.com/hustvl/LightningDiT) and [REPA-E](https://github.com/End2End-Diffusion/REPA-E) code bases
 with the same `load_sad_decoder` call.
-
-## FAQ
-
-**Does SAD change what is generated?** No. The generator, the sampler and the latent are unchanged, so content and layout stay the
-same. SAD changes how a latent is rendered: texture, color cast, exposure and local statistics.
-
-**Does it cost anything at inference?** No. The fine-tuned decoder has the same architecture as the original one.
-
-**Can I train SAD for my own generator?** Yes. You need a cache of generated latents (16k–40k), a few thousand unpaired real
-images and about one GPU-hour. See [`training/`](training/README.md) and `training/scripts/run_examples.sh`.
-
-**What doesn't it do?** It cannot add diversity or repair a wrong structure that the generator produced, and a decoder is specific
-to its generator and sampler family.
 
 ## Training and evaluation
 
