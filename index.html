@@ -210,6 +210,16 @@
         <p class="mt-3"><b>(b)</b> Decoded DiT samples lack high-frequency energy compared with real images. SAD recovers about half of the gap.</p>
       </div>
     </div>
+    <div class="columns is-vcentered mt-4">
+      <div class="column is-7"><figure class="image"><img src="static/images/ratio.png" alt="Per-sample correction against the density ratio"></figure></div>
+      <div class="column is-5">
+        <p><b>Distribution shift, not perturbation.</b> Generated latents are not off the encoder manifold: re-encoding changes
+          them as little as real latents (1.6% vs. 1.7%), yet a small classifier tells the two apart (AUC 0.96).</p>
+        <p class="mt-3"><b>The correction follows the density ratio.</b> Ranking every latent by that classifier, SAD changes
+          generated latents 9&times; more than encoder latents, and within each set the change grows with the estimated
+          density ratio (Spearman 0.57 and 0.31). The decoder corrects most where the generator over-represents.</p>
+      </div>
+    </div>
     <div class="table-container mt-4">
     <table class="table is-fullwidth is-narrow is-hoverable res">
       <thead><tr><th>Ablation (DiT-XL/2, 50-step DPM-Solver++)</th><th>FID&darr;</th><th>FD<sub>CLIP</sub>&darr;</th><th>rFID&darr;</th><th>PSNR&uarr;</th></tr></thead>
@@ -249,8 +259,8 @@
           <thead><tr><th>Decoder</th><th>FID&darr;</th><th>FD<sub>CLIP</sub>&darr;</th><th>CLIP&uarr;</th><th>Recall&uarr;</th></tr></thead>
           <tbody>
             <tr><td>D<sub>0</sub></td><td>34.73</td><td>209.1</td><td>26.03</td><td>0.286</td></tr>
-            <tr class="ours"><td>SAD, GAN &lambda;=0.01</td><td><b>23.55</b></td><td>141.6</td><td><b>26.91</b></td><td><b>0.416</b></td></tr>
-            <tr class="ours"><td>SAD, MMD &lambda;=0.3</td><td>26.19</td><td><b>125.1</b></td><td>26.66</td><td>0.364</td></tr>
+            <tr class="ours"><td>SAD, GAN &lambda;=0.01</td><td><b>23.55</b></td><td><b>141.6</b></td><td><b>26.91</b></td><td><b>0.416</b></td></tr>
+            <tr class="ours"><td>SAD, MMD &lambda;=0.1</td><td>28.35</td><td>150.4</td><td>26.19</td><td>0.343</td></tr>
           </tbody>
         </table>
       </div>
