@@ -8,7 +8,7 @@
 <sup>2</sup>University of Chinese Academy of Sciences &nbsp; <sup>3</sup>Tsinghua University
 
 <a href="https://torpedo2003.github.io/SAD/"><img src="https://img.shields.io/badge/Project-Page-blue" alt="Project page"></a>
-<a href="#"><img src="https://img.shields.io/badge/arXiv-coming%20soon-b31b1b" alt="arXiv"></a>
+<a href="https://arxiv.org/abs/2611.22458"><img src="https://img.shields.io/badge/arXiv-2611.22458-b31b1b" alt="arXiv"></a>
 <a href="https://huggingface.co/torpedo2003/SAD"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Weights-yellow" alt="Hugging Face"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green" alt="License"></a>
 
@@ -138,7 +138,7 @@ The guide also explains how to train SAD for your own generator, autoencoder and
 @article{lei2026sad,
   title   = {Sample-Aligned Decoders for Latent Generative Models},
   author  = {Lei, Yu and Li, Yi and Gao, Hongcheng and Wei, Yipeng and Li, Liang and Su, Li and Huang, Qingming},
-  journal = {arXiv preprint},
+  journal = {arXiv preprint arXiv:2611.22458},
   year    = {2026}
 }
 ```
